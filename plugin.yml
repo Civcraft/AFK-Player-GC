@@ -1,9 +1,90 @@
-name: AFKPGC
+name: ${project.name}
 main: com.github.Kraken3.AFKPGC.AFKPGC
 author: Kraken3
-version: 1.2.4
+authors: [Maxopoly]
+version: ${project.version}
 commands:
    afkpgc:
-      description: AFK Player GC - mod for kicking inactive players
-      usage: /afkpgc times | list | stop | reload | info
-      permission-message: You don't have <permission>
+      description: AFK Player GC - mod for kicking inactive players and players causing lag
+      usage: Command not found! Try /afkpgc help
+   afkpgc getacceptabletps:
+      description: Gives the tps value which needs to be undercut to start the bot detector
+      usage: /afkpgc getacceptabletps
+      aliases: gat
+      permission: AFKPGC.readValues
+   afkpgc getcriticaltpschange:
+      description: Gives the tps change which needs to be reached after kicking a player to suspect him of causing lag
+      usage: /afkpgc getcriticaltpschange
+      aliases: gctc
+      permission: AFKPGC.readValues
+   afkpgc getlongbans:
+      description: Tells whether giving out long bans in the bot detector is enabled or not
+      usage: /afkpgc getlongbans
+      aliases: glb
+      permission: AFKPGC.readValues
+   afkpgc getbannedplayers:
+      description: Lists all players currently banned by the bot detector
+      usage: /afkpgc getbannedplayers
+      aliases: gbp
+      permission: AFKPGC.readValues
+   afkpgc getsuspectedplayers:
+      description: Lists all players suspected to be botters by the bot detector
+      usage: /afkpgc getsuspectedplayers
+      aliases: gsp
+      permission: AFKPGC.readValues
+   afkpgc setacceptabletps:
+      description: Gives the tps value which needs to be undercut to start the bot detector
+      usage: /afkpgc setacceptabletps <newValue>
+      aliases: sat
+      permission: AFKPGC.configureValues
+   afkpgc setcriticaltpschange:
+      description: Gives the tps change which needs to be reached after kicking a player to suspect him of causing lag
+      usage: /afkpgc setcriticaltpschange <newValue>
+      aliases: sctc
+      permission: AFKPGC.configureValues
+   afkpgc setlongbans:
+      description: Tells whether giving out long bans in the bot detector is enabled or not
+      usage: /afkpgc setlongbans <true/false>
+      aliases: slb
+      permission: AFKPGC.configureValues
+   afkpgc info:
+      description: Tells whether AFKPGC is running and it's current version
+      usage: /afkpgc info
+      permission: AFKPGC.info
+   afkpgc list:
+      description: Lists the players which were inactive for the longest time
+      usage: /afkpgc list [amount of players listed]
+      permission: AFKPGC.configureValues
+   afkpgc reload:
+      description: Reloads the plugin by reading the config again
+      usage: /afkpgc reload
+      permission: AFKPGC.configureValues
+   afkpgc stop:
+      description: Stops the plugin
+      usage: /afkpgc stop
+      permission: AFKPGC.configureValues
+   afkpgc times:
+      description: Lists the time after which players will be afk kicked depending on the amount of players online
+      usage: /afkpgc times
+      permission: AFKPGC.times
+permissions:
+    AFKPGC.*:
+      description: Gives access to all afkpgc commands
+      default: op
+      children:
+        AFKPGC.info: true
+        AFKPGC.times: true
+        AFKPGC.readValues: true
+        AFKPGC.configureValues: true
+    AFKPGC.info:
+      description: Allows you to use /afkpgc info 
+      default: true
+    AFKPGC.times:
+      description: Allows you to use /afkpgc list
+      default: true
+    AFKPGC.readValues:
+      description: Allows you to use /afkpgc getacceptabletps, /afkpgc getcriticaltpschange, /afkpgc getlongbans, /afkpgc getbannedplayers and /afkpgc getsuspectedplayers
+      default: op
+    AFKPGC.configureValues:
+      description: Allows you to use /afkpgc setacceptabletps, /afkpgc setcriticaltpschange, /afkpgc setlongbans, /afkpgc stop and /afkpgc reload
+      default: op
