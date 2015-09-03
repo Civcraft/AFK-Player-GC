@@ -15,16 +15,12 @@ kick_thresholds:
   - When 1  to 50  players online kick after 7200 seconds
   
 bot_detector:
-  # Aggressive TPS. Above this but below acceptable, applies a "progressive" relaxation on top of other factors.
-  aggressive_TPS: 15
-  # Max Relaxation Factor. This value is interpolated to 1 over the acceptable to aggressive TPS range.
-  max_relaxation: 1.2
   # Once the TPS get below acceptable_TPS, the BotDetector starts culling potential lag causer.
   acceptable_TPS: 17.5
   # kicking_frequency is how often the bot detector runs in ticks
   kicking_frequency: 1800
   # Whether players get banned for a long time/ until the tick is high again
-  enable_bans: false
+  enable_bans: true
   # Whether Players get warnings before bans if set to true
   enable_warnings: true
   # Completely disables banning for testing and debugging purposes
@@ -106,34 +102,21 @@ lag_scanner:
     BEACON: 3
     BREWING_STAND: 1
     MOB_SPAWNER: 5
-    DROPPER: 4
-    JUKEBOX: 1
-    NOTE_BLOCK: 1
+    DROPPER: 3
+    JUKEBOX: 0
+    NOTE_BLOCK: 0
     SIGN: 0
     HOPPER: 8
-    DISPENSER: 4
+    DISPENSER: 3
     FURNACE: 1
     BURNING_FURNACE: 3
     CHEST: 0
     TRAPPED_CHEST: 0
     ENDER_CHEST: 0
-    ACTIVATOR_RAIL: 2
-    DETECTOR_RAIL: 1
     DAYLIGHT_DETECTOR: 1
     DAYLIGHT_DETECTOR_INVERTED: 1
-    DIODE: 1
-    DIODE_BLOCK_OFF: 1
-    DIODE_BLOCK_ON: 2
-    PISTON_BASE: 8
-    PISTON_STICKY_BASE: 8
-    POWERED_RAIL: 2
-    REDSTONE_COMPARATOR: 1
-    REDSTONE_COMPARATOR_OFF: 1
-    REDSTONE_COMPARATOR_ON: 2
-    REDSTONE_LAMP_OFF: 1
-    REDSTONE_LAMP_ON: 2
-    REDSTONE_TORCH_OFF: 1
-    REDSTONE_TORCH_ON: 2
+    REDSTONE_COMPARATOR_OFF: 0
+    REDSTONE_COMPARATOR_ON: 0
     WALL_BANNER: 0
     WALL_SIGN: 0
     SIGN_POST: 0
