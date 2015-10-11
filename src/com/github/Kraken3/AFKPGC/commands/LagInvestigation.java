@@ -8,6 +8,7 @@ import com.github.Kraken3.AFKPGC.AFKPGC;
 import com.github.Kraken3.AFKPGC.LagScanner;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import org.apache.commons.lang.mutable.MutableLong;
 
@@ -19,9 +20,19 @@ public class LagInvestigation extends AbstractCommand {
 
 	@Override
 	public boolean onCommand(CommandSender sender, List<String> args) {
-		MutableLong chunkWeight = new MutableLong(0L);
-		Location nextUp = LagScanner.getNextBadChunk(chunkWeight, true);
-		sender.sendMessage("Teleporting you to an uninvestigated Lag area (weight " + chunkWeight.longValue() + "): " + nextUp.toString());
+		if (sender instanceof Player) {
+			Player p = (Player) sender;
+			MutableLong chunkWeight = new MutableLong(0L);
+			Location nextUp = LagScanner.getNextBadChunk(chunkWeight, true);
+			if (nextUp != null) {
+				sender.sendMessage("Teleporting you to an uninvestigated Lag area (weight " + chunkWeight.longValue() + "): " + nextUp.toString());
+				p.teleport(nextUp);
+			} else {
+				sender.sendMessage("Nothing left to investigate");
+			}
+		} else {
+			sender.sendMessage("Can only invoke if a player in game");
+		}
 		return true;
 	}
 

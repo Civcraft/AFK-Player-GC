@@ -28,7 +28,8 @@ public class CommandHandler implements CommandExecutor {
 				new ListPlayers(plugin), new Reload(plugin), new Stop(plugin),
 				new Times(plugin), new ForceBotDetector(plugin),
 				new ClearAllReprieve(plugin), new ListAllReprieve(plugin),
-				new ToggleDebug(plugin), new FreeEveryone(plugin) });
+				new ToggleDebug(plugin), new FreeEveryone(plugin),
+				new LagInvestigation(plugin) });
 	}
 
 	private void registerCommands(AbstractCommand[] abstractCommands) {
