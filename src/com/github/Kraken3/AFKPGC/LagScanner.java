@@ -74,8 +74,7 @@ public class LagScanner {
 				if (worldChecked.contains(chunk)) {
 					return; // already marked, so fail fast.
 				}
-			}
-			if (worldChecked == null) {
+			} else {
 				worldChecked = new TreeSet<Long>();
 				worstChunksChecked.put(world, worldChecked);
 			}
