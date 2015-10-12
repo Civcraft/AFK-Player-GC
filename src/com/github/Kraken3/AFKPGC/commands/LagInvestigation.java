@@ -26,6 +26,9 @@ public class LagInvestigation extends AbstractCommand {
 			Location nextUp = LagScanner.getNextBadChunk(chunkWeight, true);
 			if (nextUp != null) {
 				sender.sendMessage("Teleporting you to an uninvestigated Lag area (weight " + chunkWeight.longValue() + "): " + nextUp.toString());
+				if (p.isInsideVehicle()) {
+					p.leaveVehicle();
+				}
 				p.teleport(nextUp);
 			} else {
 				sender.sendMessage("Nothing left to investigate");
