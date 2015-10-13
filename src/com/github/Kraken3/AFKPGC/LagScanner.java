@@ -3,12 +3,17 @@ package com.github.Kraken3.AFKPGC;
 import org.bukkit.Location;
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.Bukkit;
 import org.bukkit.block.BlockState;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.HashSet;
+import org.apache.commons.lang.mutable.MutableLong;
 
 /**
  * Should be runnable with callback. First iteration will be straight mainthread code, b/c testing.
@@ -21,6 +26,120 @@ public class LagScanner {
 
 	private static Map<String, Map<Long, LagScanner.Result>> cache = 
 			new HashMap<String, Map<Long, LagScanner.Result>>();
+
+	private static Map<String, TreeMap<Long, HashSet<Long>>> worstChunksUnchecked = 
+			new HashMap<String, TreeMap<Long, HashSet<Long>>>();
+	private static Map<String, TreeMap<Long, Long>> worstChunksUncheckedIdx = 
+			new HashMap<String, TreeMap<Long, Long>>();
+	private static Map<String, TreeSet<Long>> worstChunksChecked = 
+			new HashMap<String, TreeSet<Long>>();
+
+	/**
+	 * Gets another chunk. Goes world by world from worst chunk to best in the world.
+	 */
+	public static Location getNextBadChunk(MutableLong ml, boolean mark) {
+		synchronized(worstChunksChecked) {
+			for (String world : worstChunksUnchecked.keySet()) {
+				TreeMap<Long, HashSet<Long>> worldBad = worstChunksUnchecked.get(world);
+				if (worldBad != null && !worldBad.isEmpty()) {
+					for (Long score : worldBad.descendingKeySet()) {
+						HashSet<Long> locations = worldBad.get(score);
+						if (locations != null && !locations.isEmpty()) {
+							Long location = locations.iterator().next();
+							long chunkX = location >> 32L;
+							long chunkZ = location - (chunkX << 32L);
+							World worldQ = Bukkit.getWorld(world);
+							int locX = ((int)chunkX) * 16 + 8;
+							int locZ = ((int)chunkZ) * 16 + 8;
+							int locY = worldQ.getHighestBlockYAt(locX, locZ) + 2;
+							if (ml != null) {ml.setValue(score);}
+							if (mark) { LagScanner.markBadChunk(world, location); }
+							return new Location(worldQ, (double)locX, (double)locY, (double)locZ);
+							// find and return first location found.
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Marks a bad chunk as reviewed
+	 */
+	public static void markBadChunk(String world, Long chunk) {
+		synchronized(worstChunksChecked) {
+			TreeSet<Long> worldChecked = worstChunksChecked.get(world);
+			if (worldChecked != null) {
+				if (worldChecked.contains(chunk)) {
+					return; // already marked, so fail fast.
+				}
+			} else {
+				worldChecked = new TreeSet<Long>();
+				worstChunksChecked.put(world, worldChecked);
+			}
+			worldChecked.add(chunk);
+			// now remove from unchecked list.
+			TreeMap<Long, Long> worldIndex = worstChunksUncheckedIdx.get(world);
+			TreeMap<Long, HashSet<Long>> worldChunks = worstChunksUnchecked.get(world);
+			if (worldIndex != null) {
+				Long curval = worldIndex.get(chunk);
+				if (curval != null) { // exists.
+					HashSet<Long> valChunks = worldChunks.get(curval);
+					if (valChunks != null) {
+						valChunks.remove(chunk);
+						worldIndex.remove(chunk);
+					} else {
+						// TODO: soft exception
+					}
+				} // else doesn't exist, don't remove.
+			} // else doesn't exist, don't remove.
+		}
+	}
+
+
+	/**
+	 * Adds or updates a "bad chunk" for admin review
+	 */
+	public static void addBadChunk(String world, Long chunk, Long weight) {
+		synchronized(worstChunksChecked) {
+			TreeSet<Long> worldChecked = worstChunksChecked.get(world);
+			if (worldChecked != null) {
+				if (worldChecked.contains(chunk)) {
+					return; // checked already so fail fast.
+				}
+			} else {
+				worldChecked = new TreeSet<Long>();
+				worstChunksChecked.put(world, worldChecked);
+			}
+			TreeMap<Long, HashSet<Long>> worldC = worstChunksUnchecked.get(world);
+			TreeMap<Long, Long> worldI = worstChunksUncheckedIdx.get(world);
+			if (worldC == null) {
+				worldC = new TreeMap<Long, HashSet<Long>>(); // create new world weight index
+				worstChunksUnchecked.put(world, worldC);
+			}
+			if (worldI == null) {
+				worldI = new TreeMap<Long, Long>(); // create new world chunk index
+				worstChunksUncheckedIdx.put(world, worldI); 
+			}
+			Long prevWeight = worldI.get(chunk);
+			if (prevWeight != null) {
+				if (prevWeight.equals(weight)) {
+					return; // no change;
+				}
+				HashSet<Long> chunks = worldC.get(prevWeight);
+				chunks.remove(chunk); // remove old from weight index
+			}
+			HashSet<Long> chunks = worldC.get(weight);
+			if (chunks == null) {
+				chunks = new HashSet<Long>();
+				worldC.put(weight, chunks); // create weight index
+			}
+			chunks.add(chunk); // add to weight index
+			worldI.put(chunk, weight); // add to chunk index
+		}
+	}
+
 
 	public static long cacheTimeout;
 	public static long lagSourceThreshold;
@@ -207,6 +326,8 @@ public class LagScanner {
 		if (result.lagContrib < normalChunkValue) {
 			return new LagScanner.Result(null, 0, 0, 0, 0L, 0L);
 		}
+		// add to admincrimes list
+		LagScanner.addBadChunk(world, chunkId, result.lagContrib);
 		return result;
 	}
 

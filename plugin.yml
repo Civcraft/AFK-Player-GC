@@ -92,6 +92,11 @@ commands:
       usage: /afkpgc freeeveryone
       aliases: fe
       permission: AFKPGC.execute
+   afkpgc investigate:
+      description: Investigates the next uninvestigated lag source
+      usage: /afkpgc investigate
+      aliases: inv
+      permission: AFKPGC.execute
 permissions:
     AFKPGC.*:
       description: Gives access to all afkpgc commands
@@ -115,5 +120,5 @@ permissions:
       description: Allows you to use /afkpgc setacceptabletps, /afkpgc setcriticaltpschange, /afkpgc setlongbans, /afkpgc stop, /afkpgc reload, and /afkpgc toggledebug
       default: op
     AFKPGC.execute:
-      description: Allows you to use /afkpgc forcebotdetector, /afkpgc clearallreprieve, /afkpgc listallreprieve, /afkpgc freeeveryone
+      description: Allows you to use /afkpgc forcebotdetector, /afkpgc clearallreprieve, /afkpgc listallreprieve, /afkpgc freeeveryone, /afkpgc investigate
       default: op
