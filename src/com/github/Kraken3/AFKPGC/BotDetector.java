@@ -474,6 +474,10 @@ public class BotDetector implements Runnable {
 			else {
 				p.sendMessage(friendlyWarningMessage);
 			}
+			BanWarnEvent banWarnEvent = new BanWarnEvent(p);
+			if(!banWarnEvent.isCancelled()) {
+				Bukkit.getServer().getPluginManager().callEvent(banWarnEvent);
+			}
 			AFKPGC.debug("Player ", p.getUniqueId(), " (", p.getName(), ") was notified of presence in lag source");
 		}
 		

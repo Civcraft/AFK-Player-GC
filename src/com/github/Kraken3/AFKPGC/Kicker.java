@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.github.Kraken3.AFKPGC.commands.CommandHandler;
@@ -75,6 +76,7 @@ public class Kicker implements Runnable {
 						   
 			   if (timeOld < 0) {
 				   // Player has moved since last pass.
+				   AFKWarnEvent.warnedPlayers.remove(i);
 				   continue;
 			   }
 			   
@@ -84,6 +86,10 @@ public class Kicker implements Runnable {
 				   if (time >= threshold-t && timeOld < threshold - t) {
 					   Player p;
 					   if ((p = AFKPGC.plugin.getServer().getPlayer(i)) != null) {
+						   AFKWarnEvent afkEvent = new AFKWarnEvent(p);
+						   if(!afkEvent.isCancelled()) {
+							   Bukkit.getServer().getPluginManager().callEvent(afkEvent);
+						   }
 						   p.sendMessage(warnings[j].message);
 					   }
 				   }
