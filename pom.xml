@@ -6,7 +6,7 @@
   <groupId>com.github.Kraken3</groupId>
   <artifactId>AFKPGC</artifactId>
   <packaging>jar</packaging>
-  <version>1.3.5-${build.version}</version>
+  <version>1.3.6</version>
   <name>AFKPGC</name>
   <url>https://github.com/civcraft/AFKPGC</url>
   
