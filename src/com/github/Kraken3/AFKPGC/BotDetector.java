@@ -25,6 +25,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import vg.civcraft.mc.cbanman.CBanManagement;
+import vg.civcraft.mc.cbanman.ban.Ban;
+import vg.civcraft.mc.cbanman.ban.BanLevel;
+
 /*
  * Detects likely bots based on movement patterns and lag contributions
  * @author Maxopoly
@@ -391,8 +395,19 @@ public class BotDetector implements Runnable {
 	}
 
 	public static void freeEveryone() {
+		// TODO: When proper plugin-unban-all, use cban directly.
+		//   for now ...
+		boolean useCBan = false;
+		if (AFKPGC.plugin.getServer().getPluginManager().isPluginEnabled("CBanManagement")) {
+			useCBan = true;
+		}
 		for (int i = 0; i < bannedPlayers.size(); i++) {
-			banList.pardon(bannedPlayers.get(i));
+			if (useCBan) {
+				CBanManagement.getInstance().unbanPlayer(
+						bannedPlayers.get(i), "afkpgc");
+			} else {
+				banList.pardon(bannedPlayers.get(i));
+			}
 		}
 		bannedPlayers.clear();
 		banfile.delete();
@@ -415,6 +430,11 @@ public class BotDetector implements Runnable {
     	if (!enableBans) {
     		return;
     	}
+		boolean useCBan = false;
+		if (AFKPGC.plugin.getServer().getPluginManager().isPluginEnabled("CBanManagement")) {
+			AFKPGC.debug("Using CBanManagement");
+			useCBan = true;
+		}
 		Integer banCount = banCounts.get(s.getUUID());
 		if (banCount == null) {
 			banCount = 0;
@@ -429,16 +449,26 @@ public class BotDetector implements Runnable {
 		if (banLength == null) {
 			banLength = longBan; // keep it as worst case or default.
 		}
-    	Date currentDate=new Date();
-    	BanEntry leBan = banList.addBan( s.getName(), banMessage,
-				new Date(currentDate.getTime() + banLength), null); // long ban.
-    	Player p = Bukkit.getPlayer(s.getUUID());
-	    if (p != null) {
+		Date currentDate=new Date();
+		Player p = Bukkit.getPlayer(s.getUUID());
+		if (p != null) {
 			LagScanner.unloadChunks(p.getLocation(), scanRadius);
-			p.kickPlayer(leBan.getReason());
 		}
-		bannedPlayers.add(s.getName());
-		addToBanfile(s.getName());
+
+		if (useCBan) {
+			Ban leBan = new Ban(BanLevel.TEMP, "afkpgc", banMessage, 
+					new Date(currentDate.getTime() + banLength));
+			CBanManagement.getInstance().banPlayer(p, leBan);
+			bannedPlayers.add(s.getName()); // Once proper unban, remove this
+		} else {
+			BanEntry leBan = banList.addBan( s.getName(), banMessage,
+					new Date(currentDate.getTime() + banLength), null); // long ban.
+			if (p != null) {
+				p.kickPlayer(leBan.getReason());
+			}
+			bannedPlayers.add(s.getName());
+			addToBanfile(s.getName());
+		}
 		AFKPGC.debug("Player ", s.getUUID(), " (", s.getName(), ") banned for ",
 				banLength,"ms, confirmed lag source, incident #", (banCounts.get(s.getUUID()) + 1));
 	}
