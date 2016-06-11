@@ -6,7 +6,7 @@
   <groupId>com.github.Kraken3</groupId>
   <artifactId>AFKPGC</artifactId>
   <packaging>jar</packaging>
-  <version>1.4</version>
+  <version>1.4.1</version>
   <name>AFKPGC</name>
   <url>https://github.com/civcraft/AFKPGC</url>
   
@@ -53,7 +53,7 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>Spigot</artifactId>
-      <version>1.9</version>
+      <version>1.10</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

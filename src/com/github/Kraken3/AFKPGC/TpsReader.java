@@ -1,8 +1,8 @@
 package com.github.Kraken3.AFKPGC;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_9_R1.CraftServer;
-import net.minecraft.server.v1_9_R1.MinecraftServer;
+import org.bukkit.craftbukkit.v1_10_R1.CraftServer;
+import net.minecraft.server.v1_10_R1.MinecraftServer;
 
 /**
  * Reads TPS direct from MC instance. Note as a result this plugin works with 1.8.7 or above only, at the moment.
